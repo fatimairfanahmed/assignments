@@ -44,6 +44,7 @@ struct node* pop(struct node* top) {
   struct node* temp = top;
   top = top->next;
   temp->next = NULL;
+  free(temp);
   temp = NULL;
   return top;
 }
@@ -84,11 +85,22 @@ void print(struct node* top) {
 }
 
 int main(int argc, char* argv[]) {
+  if (argc != 2) {
+    printf("usage  ");
+    for (int i = 0; i < argc; i++){
+      printf("%s \n", argv[i]);
+    }
+    exit(0);
+  }
   struct node* stack = NULL;
-  int line = 0;
-  int column = 0;
+  int line = 1;
+  int column = 1;
   FILE* infile;
-  infile = fopen("prog2.c", "r");
+  infile = fopen(argv[1], "r");
+  if (infile == NULL) {
+    printf("Unable to open file %s\n", argv[1]);
+    exit(0);
+  }
   char curr = '?';
   while (curr != EOF){
     curr = fgetc(infile);
@@ -97,26 +109,26 @@ int main(int argc, char* argv[]) {
     }
     else if (curr == '}'){
       if (stack == NULL){
-        printf("Unmatched brace on Line %d and Column %d", stack->linenum, stack->colnum);
+        printf("Unmatched brace on Line %d and Column %d\n", line, column);
       }
-      else {
-        printf("Found matching braces:(%d, %d) -> (%d, %d)", stack->linenum,stack->colnum, line,column );
+      else if (stack->sym == '{'){
+        printf("Found matching braces:(%d, %d) -> (%d, %d)\n", stack->linenum,stack->colnum, line,column );
+        stack = pop(stack);
       }
-      stack = pop(stack);
     }
     column = column + 1;
     if (curr == '\n'){
       line = line + 1;
-      column = 0;
+      column = 1;
     }
   }
   while ( stack != NULL){
-    printf("Unmatched brace on Line %d and Column %d", stack->linenum, stack->colnum);
+    printf("Unmatched brace on Line %d and Column %d\n", stack->linenum, stack->colnum);
     stack = pop(stack);
   }
   pclose(infile);
   clear(stack);
-  free(stack);
-  stack == NULL;
+  //free(stack);
+  stack = NULL;
   return 0;
 }

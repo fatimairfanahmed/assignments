@@ -94,6 +94,8 @@ int main() {
     list = insert_sorted(list, name, quantity, cost);
   }
   head = list;
+  printf("Welcome to Sorted Sally's Snack Bar.\n");
+  printf("\n");
   for (int i = 0; i < number; i++){
     printf("%d)  ", i);
     printf("%s      ", list->name);

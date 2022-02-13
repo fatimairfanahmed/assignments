@@ -71,5 +71,10 @@ int main() {
         printf("\n");
     }
     isMagic(matrix, row, col);
+    
+    for (int i = 0; i < row; i++){
+        free(matrix[i]);
+    } 
+    free(matrix);
 }
 
