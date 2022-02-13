@@ -22,12 +22,16 @@ int main() {
   scanf("%d",&number);
   //declaring a struct pointer that points towards the dynamic memory
   struct snack* arraySnacks = malloc(sizeof(struct snack)*number); 
+  if(arraySnacks == NULL) {
+    printf("Cannot allocate new string. Exiting...\n");
+    exit(0);
+  }
   for (int i = 0; i < number; i++){
-    char* name;
-    float cost;
-    int quantity;
+    char name[32];
+    float cost = 0.0;
+    int quantity = 0;
     printf("Enter a name: \n");
-    scanf("%s",name);
+    scanf("%s", name);
     strcpy((arraySnacks + i)->name, name);
     printf("Enter a cost: \n");
     scanf("%f",&cost);

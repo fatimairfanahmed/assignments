@@ -15,6 +15,10 @@ int main() {
   //initializing a file object
   FILE* infile;
   infile = fopen("words.txt", "r");
+  if (infile == NULL){
+    printf("Unable to open file\n");
+    exit(0);
+  }
   char buffer[32]; 
   fgets(buffer,32, infile);
   int total = atoi(buffer);
@@ -29,6 +33,10 @@ int main() {
   printf("\n");
   int len = strlen(word);
   char* guess = (char*)malloc(sizeof(char)*(len+1)); 
+  if(guess == NULL) {
+    printf("Cannot allocate new string. Exiting...\n");
+    exit(0);
+  }
   for (int j = 0; j < len; j++){
     guess[j] = '_';
   }
@@ -67,5 +75,6 @@ int main() {
   printf("\n");
   printf("You won in %d turns!\n",turns);
   free(guess);
+  fclose(infile);
   return 0;
 }

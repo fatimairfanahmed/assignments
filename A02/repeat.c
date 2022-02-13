@@ -17,18 +17,20 @@ int main() {
   int len = strlen(input);
   printf("Enter a count: \n");
   scanf("%d", &repeat);
-  int total = repeat*len;
+  int total = repeat*len + 1;
+  
   //ask for dynamic memory
   char* output = (char*)malloc(sizeof(char)*total);
   if(output == NULL) {
     printf("Cannot allocate new string. Exiting...\n");
     exit(0);
   }
-
-  for (int i = 0; i < repeat; i++){
+  strcpy(output,input);
+  for (int i = 0; i < repeat - 1; i++){
       strcat(output,input);
   }
   printf("%s\n", output);
   free(output);
+  output = NULL;
   return 0;
 }
