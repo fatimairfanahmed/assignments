@@ -49,7 +49,7 @@ extern void write_ppm(const char* filename, struct ppm_pixel** pxs, int w, int h
   FILE* resultFile = fopen(filename, "wb");
   char* header = malloc(sizeof(char)*500);
   sprintf(header, "P6\n%d %d\n255\n", w, h);
-  fwrite(header, sizeof(int), 4, resultFile);
+  fwrite(header, sizeof(char), strlen(header), resultFile);
   for (int i = 0; i < h; i++){
       fwrite(pxs[i],sizeof(struct ppm_pixel), w, resultFile);
   } 

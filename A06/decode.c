@@ -13,11 +13,11 @@ int main(int argc, char** argv) {
   char* inputFile = argv[1];
   struct ppm_pixel** output = read_ppm(inputFile, &w , &h);
   printf("Reading %s with width %d and height %d\n",inputFile, w,h);
-  int totalChar = 0;
-  totalChar = (w*h*3)/8 - 1;
-  printf("Max number of characters in the image: %d\n", totalChar - 1);
+  int totalChar = (w*h*3)/8;
+  char* messageArray = (char*)malloc(sizeof(char)*totalChar + 1);
+  printf("Max number of characters in the image: %d\n", totalChar);
   unsigned char message = 0;
-  int counter = 0;
+  int counter = 0; int index = 0;
   for (int i = 0; i < h; i++){
     for (int j = 0; j < w; j ++){
       for (int k = 0; k < 3; k++){
@@ -28,18 +28,27 @@ int main(int argc, char** argv) {
           counter++;
         }
         if (counter == 8) {
-          printf("%c", message);
-          counter = 0;
-          message = 0;
+          messageArray[index] = message;
+          index++;
+          counter = 0; message = 0;
         }
       }
     }
+  }  
+
+  for (int j = 0; j <= strlen(messageArray); j++){
+    if (messageArray[j] == '\0'){
+      break;
+    }
+    printf("%c",messageArray[j]);
   }
   printf("\n");
   for (int i = 0; i < h; i++){
     free(output[i]);
   } 
   free(output);
+  free(messageArray);
+  messageArray = NULL;
   output = NULL;
   return 0;
 }

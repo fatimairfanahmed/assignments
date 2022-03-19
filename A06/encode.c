@@ -18,28 +18,25 @@ int main(int argc, char** argv) {
   char* inputFile = argv[1];
   struct ppm_pixel** output = read_ppm(inputFile, &w , &h);
   printf("Reading %s with width %d and height %d\n",inputFile, w,h);  
-  int totalChar = 0;
-  totalChar = (w*h*3)/8 - 1;
-  printf("Max number of characters in the image: %d\n", totalChar - 1);
-  char* message = NULL;
+  int totalChar = (w*h*3)/8 - 1;
+  printf("Max number of characters in the image: %d\n", totalChar);
+  char* message = malloc(sizeof(char)*totalChar + 1);
   printf("Enter a phrase: ");
-  scanf("%ms", &message);
-
+  scanf("%[^\n]s", message);
   int counter = 0; 
   int index = 0;
   unsigned char crrChar[8];
   for (int i = 0; i < h; i++){
-    for (int j = 0; j < w; j ++){
+    for (int j = 0; j < w; j++){
       for (int k = 0; k < 3; k++){
         if (counter == 8) {
           index++;
           counter = 0;
         }
-        if (index == strlen(message)){
-          i = 1000; j = 1000; k = 1000;
+        if (index > strlen(message)) {
+          i = 10000; j = 10000; k = 10000;
           break;
         }
-        printf("%c %d\n", message[index], index);
         charToBin(message[index], crrChar);
         if (counter < 8) {
           output[i][j].colors[k] = output[i][j].colors[k] & 0xfe;
@@ -63,6 +60,7 @@ int main(int argc, char** argv) {
   free(message);
   output = NULL;
   newFile = NULL;
+  message = NULL;
   return 0;
 }
 
