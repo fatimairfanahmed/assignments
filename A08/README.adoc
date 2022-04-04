@@ -1,21 +1,102 @@
+Fatima Irfan
+A08
+
 = Hardware specifications
 
-Where did your run your tests? A laptop, or goldengate?
+Where did your run your tests? A laptop, or goldengate? Laptop
 
 
 What are the performance specifications of the machine: number and speed of
-processors, size of RAM? (use `lscpu` and `free -m`)
+processors, size of RAM? (use `lscpu` and `free -m`) 8 processors and 2.3 GHz speed, 16 GB RAM
 
 
 = Allocations
 
-In `simple.c`, where does the increase in 1040 bytes come from?
+In `print.c`, where does the increase in 1040 bytes come from?
 Why is the value 1040 bytes?
+
+1040 comes from the print statement. When I remove the print statement the increase
+is 0 bytes. Print statement holds a buffer of 1024 bytes each time a call is made. 
+1040 is a default buffer for the print statement.
 
 
 How many bytes does `mylloc_list.c` allocate when the program ends? Explain why
 this amount makes sense.
 
+It allocates 1880 bytes. if we take out the print statements, the rest of the allocation is 
+coming from the malloc call. The malloc call allocated the struct chunk which has a size of 
+16 and it is being allocated 15 times so 16 * 15 = 240. Also the call reserves space for the 
+print statement inside each time so adding these up all together we would get 
+1880, which makes sense.
+
 
 = Fragementation
 
+What is fragmentation? What is the difference between internal and external fragmentation?
+
+Fragmentation is inefficient use of memory; inefficient allocation and freeing of memory.
+A block of memory that is in-use has space that is unused, this is called internal fragmentation.
+In our buffer array, we had currently used memory blocks but they had space that was unused,
+we calculated that space and printed it out to the terminal.
+External fragmentation is when you divide your memory chunks into very small pieces that they 
+cannot be used anymore. When we used the flist, we computed the smallest size of the memory chunk
+thereby displaying the extent of external fragmentation.
+
+
+Output :
+
+The initial top of the heap is 0x56056eed2000.
+Total blocks: 161 Free: 103 Used: 58
+Internal unused: total: 58 average: 3080 smallest: 511 largest: 3979  
+External unused: total: 144345 average: 1401 smallest: 10 largest: 3984
+0
+The current top of the heap is 0x56056ef28527.
+Increased by 345 (0x159) Kbyte
+Total blocks: 167 Free: 113 Used: 54
+Internal unused: total: 54 average: 2952 smallest: 107 largest: 3991  
+External unused: total: 177549 average: 1571 smallest: 10 largest: 3984
+1
+The current top of the heap is 0x56056ef2e327.
+Increased by 368 (0x170) Kbyte
+Total blocks: 169 Free: 117 Used: 52
+Internal unused: total: 52 average: 3020 smallest: 129 largest: 3977  
+External unused: total: 189341 average: 1618 smallest: 10 largest: 3997
+2
+The current top of the heap is 0x56056ef30282.
+Increased by 376 (0x178) Kbyte
+Total blocks: 172 Free: 120 Used: 52
+Internal unused: total: 52 average: 3089 smallest: 146 largest: 3989  
+External unused: total: 201235 average: 1676 smallest: 10 largest: 3998
+3
+The current top of the heap is 0x56056ef33188.
+Increased by 388 (0x184) Kbyte
+Increased by 400 (0x190) Kbyte
+Total blocks: 176 Free: 116 Used: 60
+Internal unused: total: 60 average: 3193 smallest: 984 largest: 3986
+External unused: total: 189140 average: 1630 smallest: 10 largest: 3999
+5
+The current top of the heap is 0x56056ef37045.
+Increased by 404 (0x194) Kbyte
+Total blocks: 176 Free: 128 Used: 48
+Internal unused: total: 48 average: 3195 smallest: 381 largest: 3991
+External unused: total: 227231 average: 1775 smallest: 10 largest: 4000
+6
+The current top of the heap is 0x56056ef37045.
+Increased by 404 (0x194) Kbyte
+Total blocks: 177 Free: 125 Used: 52
+Internal unused: total: 52 average: 2977 smallest: 138 largest: 3989
+External unused: total: 219943 average: 1759 smallest: 10 largest: 3999
+7
+The current top of the heap is 0x56056ef37ff5.
+Increased by 407 (0x197) Kbyte
+Total blocks: 178 Free: 118 Used: 60
+Internal unused: total: 60 average: 3223 smallest: 401 largest: 3990
+External unused: total: 193697 average: 1641 smallest: 10 largest: 4000
+8
+The current top of the heap is 0x56056ef38fa5.
+Increased by 411 (0x19b) Kbyte
+Total blocks: 178 Free: 130 Used: 48
+Internal unused: total: 48 average: 3129 smallest: 636 largest: 3987
+External unused: total: 237661 average: 1828 smallest: 10 largest: 4000
+9
+The current top of the heap is 0x56056ef38fa5.
