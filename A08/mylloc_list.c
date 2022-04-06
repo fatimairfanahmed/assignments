@@ -40,6 +40,7 @@ void *malloc (size_t size) {
     struct chunk* cnk = (struct chunk*) memory;
     cnk->size = size;
     cnk->memInUse = size;
+    cnk->next = 0;
     return (void*) (cnk + 1);
   }
 }
@@ -56,11 +57,11 @@ void free(void *memory) {
 void fragstats(void* buffers[], int len) {
   int totalInUseChunks =  0;
   int totalMemUnUsed = 0;
-  int smallMemUnUsed = 9999;
+  int smallMemUnUsed = 99999999;
   int largeMemUnUsed = 0;
   int avgMemUnUsed = 0;
   int totalFreeChunks = 0;
-  int smallMemFree =    999999;
+  int smallMemFree =    9999999;
   int largeMemFree =    0;
   int totalMemFree =    0;
   int avgMemFree =      0;
@@ -77,7 +78,8 @@ void fragstats(void* buffers[], int len) {
     }
     freeNext = freeNext->next;
   }
-  avgMemFree = totalMemFree/totalFreeChunks;
+
+  avgMemFree = totalFreeChunks > 0? totalMemFree/totalFreeChunks : 0;
 
   for (int i = 0; i < len; i++){
     if (buffers[i] != NULL){
@@ -93,8 +95,7 @@ void fragstats(void* buffers[], int len) {
       }
     }
   }
-  avgMemUnUsed = totalMemUnUsed/totalInUseChunks;
-
+  avgMemUnUsed = totalInUseChunks > 0? totalMemUnUsed/totalInUseChunks : 0;
   printf("Total blocks: %d Free: %d Used: %d\n", totalFreeChunks + totalInUseChunks, totalFreeChunks, totalInUseChunks);
   printf("Internal unused: total: %d average: %d smallest: %d largest: %d\n",totalInUseChunks,avgMemUnUsed,smallMemUnUsed,largeMemUnUsed);
   printf("External unused: total: %d average: %d smallest: %d largest: %d\n", totalMemFree, avgMemFree, smallMemFree, largeMemFree);
