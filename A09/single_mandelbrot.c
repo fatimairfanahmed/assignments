@@ -10,6 +10,39 @@ Fatima Irfan
 #include <sys/time.h>
 #include "read_ppm.h"
 
+struct ppm_pixel** sub_image(struct ppm_pixel* palette, struct ppm_pixel** result, int size, int xmin, int xmax, int ymin, int ymax, int maxIterations){
+  for (int r = 0; r < size; r++){
+    for (int c = 0; c < size; c++){
+      float row = r;
+      float col = c;
+      float xfrac = col/size;
+      float yfrac = row/size;
+      float x0 = xmin + xfrac*(xmax - xmin);
+      float y0 = ymin + yfrac*(ymax - ymin);
+      float x = 0;
+      float y = 0;
+      int iter = 0;
+      while (iter < maxIterations && x*x + y*y < 2*2){
+        float xtmp = x*x - y*y + x0;
+        y = 2*x*y + y0;
+        x = xtmp;
+        iter++;
+      }
+
+      if (iter < maxIterations) {
+        result[r][c] = palette[iter];
+      }
+      else {
+        result[r][c].red = 0;
+        result[r][c].green = 0;
+        result[r][c].blue = 0;
+      }
+    }
+  }
+  return result;
+}
+
+
 int main(int argc, char* argv[]) {
   int size = 480;
   float xmin = -2.0;
@@ -51,34 +84,8 @@ int main(int argc, char* argv[]) {
   struct timeval tstart, tend;
   gettimeofday(&tstart, NULL);
 
-  for (int r = 0; r < size; r++){
-    for (int c = 0; c < size; c++){
-      float row = r;
-      float col = c;
-      float xfrac = col/size;
-      float yfrac = row/size;
-      float x0 = xmin + xfrac*(xmax - xmin);
-      float y0 = ymin + yfrac*(ymax - ymin);
-      float x = 0;
-      float y = 0;
-      int iter = 0;
-      while (iter < MAX && x*x + y*y < 2*2){
-        float xtmp = x*x - y*y + x0;
-        y = 2*x*y + y0;
-        x = xtmp;
-        iter++;
-      }
+  result = sub_image(palette,result,size,xmin,xmax,ymin,ymax,MAX);
 
-      if (iter < MAX) {
-        result[r][c] = palette[iter];
-      }
-      else {
-        result[r][c].red = 0;
-        result[r][c].green = 0;
-        result[r][c].blue = 0;
-      }
-    }
-  }
   gettimeofday(&tend, NULL);
   timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
   printf("Computed mandelbrot set (%dx%d) in %lf seconds\n", size, size,timer);

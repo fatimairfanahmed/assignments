@@ -1,3 +1,8 @@
+/*
+Fatima Irfan
+17th April 2022
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -28,14 +33,14 @@ void sub_image(struct ppm_pixel* palette, struct ppm_pixel* result, int size, in
         iter++;
       }
       if (iter < maxIterations) {
-        int cols = size/2;
-        result[r*cols + c] = palette[iter];
+        //int cols = size/2;
+        result[r*size + c] = palette[iter];
       }
       else {
         int cols = size/2;
-        result[r*cols + c].red = 0;
-        result[r*cols + c].green = 0;
-        result[r*cols + c].blue = 0;
+        result[r*size + c].red = 0;
+        result[r*size + c].green = 0;
+        result[r*size + c].blue = 0;
       }
     }
   }
@@ -62,6 +67,7 @@ int main(int argc, char* argv[]) {
         "-b <ymin> -t <ymax> -p <numProcesses>\n", argv[0]); break;
     }
   }
+  srand(time(0));
   printf("Generating mandelbrot with size %dx%d\n", size, size);
   printf("  Num processes = %d\n", numProcesses);
   printf("  X range = [%.4f,%.4f]\n", xmin, xmax);
@@ -85,6 +91,10 @@ int main(int argc, char* argv[]) {
     exit(1);
   } 
 
+  double timer;
+  struct timeval tstart, tend;
+  gettimeofday(&tstart, NULL);
+
   pid_t child_1, child_2, child_3, child_4;
   child_1 = fork();          //child process 1
   if (child_1 > 0 ) {
@@ -94,46 +104,46 @@ int main(int argc, char* argv[]) {
       if (child_3 > 0) {
         child_4 = fork();   //child process 4
         if (child_4 == 0){
-          int start_row = 0;
-          int start_col = 0;
+          int start_row = size/2;
+          int start_col = size/2;
           int end_row = start_row + size/2;
           int end_col = start_col + size/2;
-          printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
           printf("Launched child process: %d\n", getpid());
-          sub_image(palette,result,size,0,0,xmin,xmax,ymin,ymax,maxIterations);
+          printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
+          sub_image(palette,result,size,start_row,start_col,xmin,xmax,ymin,ymax,maxIterations);
           exit(0);
         }
       }
       else {
-        int start_row = size/2;
-        int start_col = 0;
+        int start_row = 0;
+        int start_col = size/2;
         int end_row = start_row + size/2;
         int end_col = start_col + size/2;
-        printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
         printf("Launched child process: %d\n", getpid());
-        sub_image(palette,result,size,size/2,0,xmin,xmax,ymin,ymax,maxIterations);
+        printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
+        sub_image(palette,result,size,start_row,start_col,xmin,xmax,ymin,ymax,maxIterations);
         exit(0);
       }
     }
     else {
-      int start_row = 0;
-      int start_col = size/2;
+      int start_row = size/2;
+      int start_col = 0;
       int end_row = start_row + size/2;
       int end_col = start_col + size/2;
-      printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
       printf("Launched child process: %d\n", getpid());
-      sub_image(palette,result,size,0,size/2,xmin,xmax,ymin,ymax,maxIterations);
+      printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
+      sub_image(palette,result,size,start_row,start_col,xmin,xmax,ymin,ymax,maxIterations);
       exit(0);
     }
   }
   else {
-    int start_row = size/2;
-    int start_col = size/2;
+    int start_row = 0;
+    int start_col = 0;
     int end_row = start_row + size/2;
     int end_col = start_col + size/2;
-    printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
     printf("Launched child process: %d\n", getpid());
-    sub_image(palette,result,size,size/2,size/2,xmin,xmax,ymin,ymax,maxIterations);
+    printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
+    sub_image(palette,result,size,start_row,start_col,xmin,xmax,ymin,ymax,maxIterations);
     exit(0);
   }
 
@@ -142,6 +152,10 @@ int main(int argc, char* argv[]) {
     int pid = wait(&status);
     printf("Child process complete: %d\n", pid);
   }
+
+  gettimeofday(&tend, NULL);
+  timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
+  printf("Computed mandelbrot set (%dx%d) in %lf seconds\n", size, size,timer);
 
   struct ppm_pixel** final_result = (struct ppm_pixel**)malloc(sizeof(struct ppm_pixel*)*(size));
   for (int i = 0; i < size; i++) { 
@@ -156,7 +170,7 @@ int main(int argc, char* argv[]) {
 
   char newFile[50];
   int timeNow = time(0);
-  sprintf(newFile, "temp_mandelbrot-%d-%d.ppm", size, timeNow);
+  sprintf(newFile, "multi-mandelbrot-%d-%d.ppm", size, timeNow);
   printf("Writing file: %s\n", newFile);
   write_ppm(newFile, final_result, size , size);
 
