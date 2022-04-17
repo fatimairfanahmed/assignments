@@ -33,7 +33,6 @@ void sub_image(struct ppm_pixel* palette, struct ppm_pixel* result, int size, in
         iter++;
       }
       if (iter < maxIterations) {
-        //int cols = size/2;
         result[r*size + c] = palette[iter];
       }
       else {
@@ -89,6 +88,11 @@ int main(int argc, char* argv[]) {
   if (result == (void*) -1) {
     perror("Error: cannot access shared memory\n");
     exit(1);
+  } 
+
+  struct ppm_pixel** final_result = (struct ppm_pixel**)malloc(sizeof(struct ppm_pixel*)*(size));
+  for (int i = 0; i < size; i++) { 
+    final_result[i] = malloc(sizeof(struct ppm_pixel)*(size)); 
   } 
 
   double timer;
@@ -157,10 +161,6 @@ int main(int argc, char* argv[]) {
   timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
   printf("Computed mandelbrot set (%dx%d) in %lf seconds\n", size, size,timer);
 
-  struct ppm_pixel** final_result = (struct ppm_pixel**)malloc(sizeof(struct ppm_pixel*)*(size));
-  for (int i = 0; i < size; i++) { 
-    final_result[i] = malloc(sizeof(struct ppm_pixel)*(size)); 
-  } 
 
   for (int i = 0; i < size; i++){
     for (int j = 0; j < size; j++){
@@ -187,6 +187,7 @@ int main(int argc, char* argv[]) {
   free(palette);
   palette = NULL;
   result = NULL;
+  
   for (int i = 0; i < size; i++){
     free(final_result[i]);
   } 
