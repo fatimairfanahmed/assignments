@@ -7,7 +7,6 @@
 #include <pthread.h>
 #include "read_ppm.h"
 
-pthread_mutex_t mutex;
 
 struct thread_data {
   struct ppm_pixel* palette;
@@ -25,7 +24,6 @@ struct thread_data {
 };
 
 void* sub_image(void* userData){
-  pthread_mutex_lock(&mutex);
   struct thread_data* data = (struct thread_data*)userData;
   int end_row = data->start_row + data->sub_size;
   int end_col = data->start_col + data->sub_size;
@@ -59,7 +57,6 @@ void* sub_image(void* userData){
     }
   }
     printf("Thread  %lu) finished\n", pthread_self());
-    pthread_mutex_unlock(&mutex);
     return (void*)NULL; 
 }
 
@@ -110,7 +107,6 @@ int main(int argc, char* argv[]) {
   struct timeval tstart, tend;
   gettimeofday(&tstart, NULL);
 
-  pthread_mutex_init(&mutex, NULL);
   for (int i = 0; i < 4; i++) {
     data[i].palette = palette;
     data[i].result = result;
@@ -152,5 +148,4 @@ int main(int argc, char* argv[]) {
   free(palette);
   result = NULL;
   palette = NULL;
-  pthread_mutex_destroy(&mutex); 
 }

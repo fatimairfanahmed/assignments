@@ -8,6 +8,7 @@
 #include "read_ppm.h"
 #include "stdbool.h"
 #include "math.h"
+#include <string.h>
 
 pthread_mutex_t mutex;
 pthread_barrier_t barrier;
@@ -95,7 +96,6 @@ void* sub_image(void* userData) {
           pthread_mutex_unlock(&data->mutex);
         }
       }
-      
     }  
   }
   
@@ -154,12 +154,15 @@ int main(int argc, char* argv[]) {
   bool** member = (bool**)malloc(sizeof(bool*)*(size));
   for (int i = 0; i < size; i++) { 
     member[i] = malloc(sizeof(bool)*(size)); 
+    memset(member[i], 0, size*sizeof(bool));
   } 
   
   int** count = (int**)malloc(sizeof(int*)*(size));
   for (int i = 0; i < size; i++) { 
     count[i] = malloc(sizeof(int)*(size)); 
+    memset(count[i], 0, size*sizeof(int));
   }
+
 
   struct ppm_pixel* palette = (struct ppm_pixel*)(malloc(sizeof(struct ppm_pixel)*maxIterations));
   for (int j = 0; j < maxIterations; j++){
