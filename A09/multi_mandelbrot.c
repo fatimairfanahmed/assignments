@@ -14,12 +14,13 @@ Fatima Irfan
 #include <sys/ipc.h>
 #include "read_ppm.h"
 
-void sub_image(struct ppm_pixel* palette, struct ppm_pixel* result, int size, int start_row, int start_col, int xmin, int xmax, int ymin, int ymax, int maxIterations){
+void sub_image(struct ppm_pixel* palette, struct ppm_pixel* result, int size, int start_row, int start_col, float xmin, float xmax, float ymin, float ymax, int maxIterations){
   int end_row = start_row + size/2;
   int end_col = start_col + size/2;
   for (int r = start_row; r < end_row; r++){
     for (int c = start_col; c < end_col; c++){
-      float row = r, col = c;
+      float row = r;
+      float col = c;
       float xfrac = col/size;
       float yfrac = row/size;
       float x0 = xmin + xfrac*(xmax - xmin);
@@ -90,11 +91,6 @@ int main(int argc, char* argv[]) {
     exit(1);
   } 
 
-  struct ppm_pixel** final_result = (struct ppm_pixel**)malloc(sizeof(struct ppm_pixel*)*(size));
-  for (int i = 0; i < size; i++) { 
-    final_result[i] = malloc(sizeof(struct ppm_pixel)*(size)); 
-  } 
-
   double timer;
   struct timeval tstart, tend;
   gettimeofday(&tstart, NULL);
@@ -115,6 +111,8 @@ int main(int argc, char* argv[]) {
           printf("Launched child process: %d\n", getpid());
           printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
           sub_image(palette,result,size,start_row,start_col,xmin,xmax,ymin,ymax,maxIterations);
+          free(palette);
+          palette = NULL;
           exit(0);
         }
       }
@@ -126,6 +124,8 @@ int main(int argc, char* argv[]) {
         printf("Launched child process: %d\n", getpid());
         printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
         sub_image(palette,result,size,start_row,start_col,xmin,xmax,ymin,ymax,maxIterations);
+        free(palette);
+        palette = NULL;
         exit(0);
       }
     }
@@ -137,6 +137,8 @@ int main(int argc, char* argv[]) {
       printf("Launched child process: %d\n", getpid());
       printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
       sub_image(palette,result,size,start_row,start_col,xmin,xmax,ymin,ymax,maxIterations);
+      free(palette);
+      palette = NULL;
       exit(0);
     }
   }
@@ -148,6 +150,8 @@ int main(int argc, char* argv[]) {
     printf("Launched child process: %d\n", getpid());
     printf("%d) Sub-image block: cols (%d, %d) to rows (%d, %d)\n", getpid(), start_col, end_col, start_row, end_row);
     sub_image(palette,result,size,start_row,start_col,xmin,xmax,ymin,ymax,maxIterations);
+    free(palette);
+    palette = NULL;
     exit(0);
   }
 
@@ -161,7 +165,11 @@ int main(int argc, char* argv[]) {
   timer = tend.tv_sec - tstart.tv_sec + (tend.tv_usec - tstart.tv_usec)/1.e6;
   printf("Computed mandelbrot set (%dx%d) in %lf seconds\n", size, size,timer);
 
-
+  
+  struct ppm_pixel** final_result = (struct ppm_pixel**)malloc(sizeof(struct ppm_pixel*)*(size));
+  for (int i = 0; i < size; i++) { 
+    final_result[i] = malloc(sizeof(struct ppm_pixel)*(size)); 
+  } 
   for (int i = 0; i < size; i++){
     for (int j = 0; j < size; j++){
       final_result[i][j] = result[i*size + j];
@@ -186,7 +194,7 @@ int main(int argc, char* argv[]) {
    
   free(palette);
   palette = NULL;
-  result = NULL;
+  //result = NULL;
   
   for (int i = 0; i < size; i++){
     free(final_result[i]);

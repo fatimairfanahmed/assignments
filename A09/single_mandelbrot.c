@@ -10,7 +10,7 @@ Fatima Irfan
 #include <sys/time.h>
 #include "read_ppm.h"
 
-struct ppm_pixel** sub_image(struct ppm_pixel* palette, struct ppm_pixel** result, int size, int xmin, int xmax, int ymin, int ymax, int maxIterations){
+struct ppm_pixel** sub_image(struct ppm_pixel* palette, struct ppm_pixel** result, int size, float xmin, float xmax, float ymin, float ymax, int maxIterations){
   for (int r = 0; r < size; r++){
     for (int c = 0; c < size; c++){
       float row = r;
@@ -41,7 +41,6 @@ struct ppm_pixel** sub_image(struct ppm_pixel* palette, struct ppm_pixel** resul
   }
   return result;
 }
-
 
 int main(int argc, char* argv[]) {
   int size = 480;
